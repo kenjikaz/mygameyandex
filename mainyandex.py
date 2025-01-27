@@ -52,7 +52,7 @@ testY = 10
 
 
 
-def show_score():
+def show_score(x , y):
     score = font.render("Score : " + str(score_value), True, (255, 255, 255))
     screen.blit(score, (x, y))
 
@@ -99,7 +99,7 @@ def fire_bullet(x, y):
 
 
 def is_collision():
-
+    pass
 
 
 running = True
@@ -117,9 +117,39 @@ while running:
             if (event.key == pygame.K_a or event.key == pygame.K_LEFT) or (event.key == pygame.K_d
                                                                            or event.key == pygame.K_RIGHT):
                 playerX_change = 0
-    # тут будет изменение движения врагов
-    # тут будет изменение движение снаряда
-    # тут будет проверка коллизий
-    # тут будет обновления счета игрока
 
+    playerX += playerX_change
+    if playerX <= 0:
+        playerX = 0
+    elif playerX >= 736:
+        playerX = 736
+
+    for i in range(num_of_enemies):
+
+        # Game Over
+        if enemyY[i] > 440:
+            for j in range(num_of_enemies):
+                enemyY[j] = 2000
+            game_over_text()
+            break
+
+        enemyX[i] += 0.5 * enemyX_change[i]
+        if enemyX[i] <= 0:
+            enemyX_change[i] = 1
+            enemyY[i] += enemyY_change[i]
+        elif enemyX[i] >= 736:
+            enemyX_change[i] = -1
+            enemyY[i] += enemyY_change[i]
+
+        if pokeballY <= 0:
+            pokeballY = 480
+            pokeball_state = "ready"
+
+        if pokeball_state == "fire":
+            fire_bullet(pokeballX, pokeballY)
+            pokeballY -= pokeballY_change
+    pygame.display.update()
+
+    player(playerX, playerY)
+    show_score(textX, testY)
     pygame.display.update()
