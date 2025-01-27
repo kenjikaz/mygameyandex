@@ -1,5 +1,7 @@
 import pygame
 from pygame import mixer
+import sys
+import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
@@ -26,6 +28,13 @@ enemyX_change = []
 enemyY_change = []
 num_of_enemies = 6
 
+for i in range(num_of_enemies):
+    enemyImg.append(pygame.image.load('enemy.png'))
+    enemyX.append(random.randint(0, 736))
+    enemyY.append(random.randint(0, 150))
+    enemyX_change.append(4)
+    enemyY_change.append(40)
+
 pokeballImg = pygame.image.load('pokeball.png')
 pokeballX = 0
 pokeballY = 480
@@ -36,14 +45,16 @@ pokeball_state = "ready"
 
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
+gameover_font = pygame.font.Font('freesansbold.ttf', 64)
 
 textX = 10
 testY = 10
 
-gameover_font = pygame.font.Font('freesansbold.ttf', 64)
 
 
 def show_score():
+    score = font.render("Score : " + str(score_value), True, (255, 255, 255))
+    screen.blit(score, (x, y))
 
 
 def pause_menu():
@@ -51,7 +62,18 @@ def pause_menu():
     mixer.music.stop()
     menu.play(-1)
     while paused:
-        pass
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = False
+                    mixer.music.play(-1)
+
+        text = font.render("Пауза", True, "white")
+        screen.blit(text, (800 // 2 - text.get_width() // 2, 600 // 2 - text.get_height() // 2))
+        pygame.display.flip()
 
 
 
@@ -62,31 +84,42 @@ def game_over_text():
     menu.play(0)
 
 
-def player():
+def player(x, y):
+    screen.blit(playerImg, (x, y))
 
 
-def enemy():
+def enemy(x, y, i):
+    screen.blit(enemyImg[i], (x, y))
 
 
-def fire_bullet():
-    global bullet_state
+def fire_bullet(x, y):
+    global pokeball_state
+    pokeball_state = "fire"
+    screen.blit(pokeballImg, (x + 16, y + 10))
 
 
 def is_collision():
-    running = True
-    while running:
-        screen.fill((0, 0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    # изменение координаты Х игрока = -1
-                if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    # изменение координаты Х игрока = 1
-        # тут будет изменение движения врагов
-        # тут будет изменение движение снаряда
-        # тут будет проверка коллизий
-        # тут будет обновления счета игрока
 
-        pygame.display.update()
+
+
+running = True
+while running:
+    screen.fill((0, 0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                playerX_change = -1
+            if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                playerX_change = 1
+        if event.type == pygame.KEYUP:
+            if (event.key == pygame.K_a or event.key == pygame.K_LEFT) or (event.key == pygame.K_d
+                                                                           or event.key == pygame.K_RIGHT):
+                playerX_change = 0
+    # тут будет изменение движения врагов
+    # тут будет изменение движение снаряда
+    # тут будет проверка коллизий
+    # тут будет обновления счета игрока
+
+    pygame.display.update()
