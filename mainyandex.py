@@ -2,6 +2,7 @@ import pygame
 from pygame import mixer
 import sys
 import random
+import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
@@ -12,7 +13,6 @@ mixer.music.load("background.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(5)
 
-pygame.display.set_caption("PokeWars")
 icon = pygame.image.load('pokeball.png')
 pygame.display.set_icon(icon)
 
@@ -52,7 +52,7 @@ testY = 10
 
 
 
-def show_score(x , y):
+def show_score(x, y):
     score = font.render("Score : " + str(score_value), True, (255, 255, 255))
     screen.blit(score, (x, y))
 
@@ -69,13 +69,12 @@ def pause_menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = False
+                    menu.stop()
                     mixer.music.play(-1)
 
         text = font.render("Пауза", True, "white")
         screen.blit(text, (800 // 2 - text.get_width() // 2, 600 // 2 - text.get_height() // 2))
         pygame.display.flip()
-
-
 
 def game_over_text():
     gameover_text = gameover_font.render("GAME OVER", True, (255, 0, 0))
@@ -92,31 +91,50 @@ def enemy(x, y, i):
     screen.blit(enemyImg[i], (x, y))
 
 
-def fire_bullet(x, y):
+def fire_pokeball(x, y):
     global pokeball_state
     pokeball_state = "fire"
     screen.blit(pokeballImg, (x + 16, y + 10))
 
 
-def is_collision():
-    pass
+def is_collision(enemyX, enemyY, bulletX, bulletY):
+    distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
+    if distance < 30:
+        return True
+    else:
+        return False
 
 
 running = True
 while running:
+
+    # RGB = Red, Green, Blue
     screen.fill((0, 0, 0))
+    # Background Image
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        # if keystroke is pressed check whether its right or left
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                 playerX_change = -1
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 playerX_change = 1
+            if event.key == pygame.K_ESCAPE:
+                pause_menu()
+            if event.key == pygame.K_SPACE:
+                if pokeball_state == "ready":
+                    pokeballSound = mixer.Sound("throw.wav")
+                    pokeballSound.play()
+                    pokeballX = playerX
+                    fire_pokeball(pokeballX, pokeballY)
+
         if event.type == pygame.KEYUP:
             if (event.key == pygame.K_a or event.key == pygame.K_LEFT) or (event.key == pygame.K_d
                                                                            or event.key == pygame.K_RIGHT):
                 playerX_change = 0
+
 
     playerX += playerX_change
     if playerX <= 0:
@@ -141,14 +159,25 @@ while running:
             enemyX_change[i] = -1
             enemyY[i] += enemyY_change[i]
 
-        if pokeballY <= 0:
+        collision = is_collision(enemyX[i], enemyY[i], pokeballX, pokeballY)
+        if collision:
+            explosionSound = mixer.Sound("chew.wav")
+            explosionSound.play()
             pokeballY = 480
             pokeball_state = "ready"
+            score_value += 1
+            enemyX[i] = random.randint(0, 736)
+            enemyY[i] = random.randint(50, 150)
 
-        if pokeball_state == "fire":
-            fire_bullet(pokeballX, pokeballY)
-            pokeballY -= pokeballY_change
-    pygame.display.update()
+        enemy(enemyX[i], enemyY[i], i)
+
+    if pokeballY <= 0:
+        pokeballY = 480
+        pokeball_state = "ready"
+
+    if pokeball_state == "fire":
+        fire_pokeball(pokeballX, pokeballY)
+        pokeballY -= pokeballY_change
 
     player(playerX, playerY)
     show_score(textX, testY)
