@@ -8,15 +8,15 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("PokeWars")
 
-menu = pygame.mixer.Sound("dist/звуки/menu.wav")
-mixer.music.load("background.wav")
+menu = pygame.mixer.Sound("sounds/menu.wav")
+mixer.music.load("sounds/background.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(5)
 
-icon = pygame.image.load('pokeball.png')
+icon = pygame.image.load('images/pokeball.png')
 pygame.display.set_icon(icon)
 
-playerImg = pygame.image.load('abrakadabra.png')
+playerImg = pygame.image.load('images/abrakadabra.png')
 playerX = 370
 playerY = 480
 playerX_change = 0
@@ -29,13 +29,13 @@ enemyY_change = []
 num_of_enemies = 6
 
 for i in range(num_of_enemies):
-    enemyImg.append(pygame.image.load('enemy.png'))
+    enemyImg.append(pygame.image.load('images/enemy.png'))
     enemyX.append(random.randint(0, 736))
     enemyY.append(random.randint(0, 150))
     enemyX_change.append(4)
     enemyY_change.append(40)
 
-pokeballImg = pygame.image.load('pokeball.png')
+pokeballImg = pygame.image.load('images/pokeball.png')
 pokeballX = 0
 pokeballY = 480
 pokeballX_change = 0
@@ -125,7 +125,7 @@ while running:
                 pause_menu()
             if event.key == pygame.K_SPACE:
                 if pokeball_state == "ready":
-                    pokeballSound = mixer.Sound("throw.wav")
+                    pokeballSound = mixer.Sound("sounds/throw.wav")
                     pokeballSound.play()
                     pokeballX = playerX
                     fire_pokeball(pokeballX, pokeballY)
@@ -161,7 +161,7 @@ while running:
 
         collision = is_collision(enemyX[i], enemyY[i], pokeballX, pokeballY)
         if collision:
-            explosionSound = mixer.Sound("chew.wav")
+            explosionSound = mixer.Sound("sounds/chew.wav")
             explosionSound.play()
             pokeballY = 480
             pokeball_state = "ready"
