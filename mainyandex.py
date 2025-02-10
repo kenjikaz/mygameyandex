@@ -8,7 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("PokeWars")
 
-menu = pygame.mixer.Sound("menu.wav")
+menu = pygame.mixer.Sound("dist/звуки/menu.wav")
 mixer.music.load("background.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(5)
